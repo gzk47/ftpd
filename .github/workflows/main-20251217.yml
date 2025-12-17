@@ -1,0 +1,68 @@
+name: Build & Release FTPD Pro
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-switch:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64:latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install system dependencies
+        run: |
+          apt update && apt install -y \
+            cmake patch git gcc g++ zstd imagemagick zlib1g-dev pkg-config \
+            libglfw3-dev libcurl4-openssl-dev libgl1-mesa-dev libjansson-dev
+
+      - name: Install Switch devkitPro packages
+        run: |
+          dkp-pacman -Syu --noconfirm
+          dkp-pacman -S --noconfirm switch-dev switch-zlib switch-jansson deko3d --overwrite '*'
+
+      - name: Extract version from CMakeLists.txt
+        run: |
+          PROJECT_VERSION=$(grep 'project(ftpd VERSION' CMakeLists.txt | sed 's/.*VERSION \([0-9.]\+\).*/\1/')
+          FTPD_PATCH=$(grep 'set(FTPD_PATCH' CMakeLists.txt | sed 's/.*"-//;s/".*//')
+          FULL_VERSION="${PROJECT_VERSION}${FTPD_PATCH}"
+          echo "FULL_VERSION=${FULL_VERSION}" >> $GITHUB_ENV
+          echo "TAG_VERSION=v${FULL_VERSION}" >> $GITHUB_ENV
+
+      - name: Build Linux version
+        run: |
+          mkdir -p build-linux && cd build-linux
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DFTPD_CLASSIC=OFF
+          make -j$(nproc)
+          tar -czf ../ftpd-linux-${{ env.FULL_VERSION }}.tar.gz ftpd
+
+      - name: Build Switch version
+        shell: /usr/bin/bash -e {0}
+        run: |
+          . /opt/devkitpro/switchvars.sh
+          mkdir -p build-switch && cd build-switch
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE=Release
+          make -j$(nproc)
+          cp ftpd.nro ../ftpd-switch-${{ env.FULL_VERSION }}.nro
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG_VERSION }}
+          name: FTPD Pro ${{ env.FULL_VERSION }}
+          body: |
+            #### FTPD Pro ${{ env.FULL_VERSION }}
+            - Compiled for Linux / Nintendo Switch
+            - Version synced with CMakeLists.txt
+          files: |
+            ./ftpd-linux-${{ env.FULL_VERSION }}.tar.gz
+            ./ftpd-switch-${{ env.FULL_VERSION }}.nro
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

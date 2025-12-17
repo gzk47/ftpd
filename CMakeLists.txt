@@ -163,7 +163,7 @@ if(NINTENDO_SWITCH)
 	if(FTPD_CLASSIC)
 		nx_generate_nacp(${FTPD_TARGET}.nacp
 			NAME "${PROJECT_NAME} classic"
-			AUTHOR "(c) 2025 Michael Theall, Dave Murphy, TuxSH"
+			AUTHOR "(c) 2026 Michael Theall, Dave Murphy, TuxSH, gzk_47"
 			VERSION "${PROJECT_VERSION}${FTPD_PATCH}"
 		)
 
@@ -258,7 +258,7 @@ if(NINTENDO_SWITCH)
 
 	nx_generate_nacp(${FTPD_TARGET}.nacp
 		NAME "${PROJECT_NAME} 11th Anniversary Edition"
-		AUTHOR "(c) 2025 Michael Theall, Dave Murphy, TuxSH"
+		AUTHOR "(c) 2026 Michael Theall, Dave Murphy, TuxSH, gzk_47"
 		VERSION "${PROJECT_VERSION}${FTPD_PATCH}"
 	)
 
@@ -276,7 +276,7 @@ elseif(NINTENDO_3DS)
 		ctr_generate_smdh(${FTPD_TARGET}.smdh
 			NAME "${PROJECT_NAME} classic"
 			DESCRIPTION "v${PROJECT_VERSION}${FTPD_PATCH}"
-			AUTHOR "(c) 2025 Michael Theall, Dave Murphy, TuxSH"
+			AUTHOR "(c) 2026 Michael Theall, Dave Murphy, TuxSH, gzk_47"
 			ICON meta/icon.png
 		)
 
@@ -346,7 +346,7 @@ elseif(NINTENDO_3DS)
 	ctr_generate_smdh(${FTPD_TARGET}.smdh
 		NAME "${PROJECT_NAME} pro"
 		DESCRIPTION "v${PROJECT_VERSION}${FTPD_PATCH}"
-		AUTHOR "(c) 2025 Michael Theall, Dave Murphy, TuxSH"
+		AUTHOR "(c) 2026 Michael Theall, Dave Murphy, TuxSH, gzk_47"
 		ICON meta/icon.png
 	)
 
